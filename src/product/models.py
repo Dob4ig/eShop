@@ -1,6 +1,8 @@
 from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, Text
 from datetime import datetime
-from models.models import metadata
+from sqlalchemy import MetaData
+
+metadata = MetaData()
 
 
 product = Table(
