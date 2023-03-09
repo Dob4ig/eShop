@@ -11,5 +11,6 @@ product = Table(
     Column("id", Integer, primary_key=True),
     Column("name", String(50), nullable=False),
     Column("description", Text, nullable=False),
-    Column("added_at", TIMESTAMP, nullable=False, default=datetime.utcnow)
+    Column("added_at", TIMESTAMP, nullable=False, default=datetime.utcnow),
+    Column("seller_id", Integer, nullable=False)
 )
