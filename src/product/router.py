@@ -49,7 +49,7 @@ async def get_product(id: int,
 
 
 @router.get("/seller/{id}", response_model=List[ProductGet])
-async def get_product_by_seller_id(
+async def get_products_by_seller_id(
         id: int,
         session: AsyncSession = Depends(get_async_session)):
 
