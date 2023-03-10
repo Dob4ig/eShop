@@ -1,10 +1,11 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from product.schemas import ProductAdd
 from product.models import product
 from database import get_async_session
-
+from product.schemas import ProductGet
 router = APIRouter()
 
 
@@ -45,3 +46,13 @@ async def get_product(id: int,
         "status": "success",
         "data": tuple(result),
         "details": None}
+
+
+@router.get("/seller/{id}", response_model=List[ProductGet])
+async def get_product_by_seller_id(
+        id: int,
+        session: AsyncSession = Depends(get_async_session)):
+
+    query = select(product).where(product.c.seller_id == id)
+    result = await session.execute(query)
+    return result.all()
