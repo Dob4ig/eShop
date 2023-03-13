@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from product.schemas import ProductAdd
-from product.models import product
+from product.models import Product
 from database import get_async_session
 from product.schemas import ProductGet
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/add")
 async def add_product(new_product: ProductAdd,
                       session: AsyncSession = Depends(get_async_session)):
-    stmt = insert(product).values(**new_product.dict())
+    stmt = insert(Product).values(**new_product.dict())
     await session.execute(stmt)
     await session.commit()
     return {
@@ -31,7 +31,7 @@ async def get_product(id: int,
             "details": "Product id cannot be negative number"
         })
 
-    query = select(product).where(product.c.id == id)
+    query = select(Product).where(Product.c.id == id)
     result = await session.execute(query)
     result = result.fetchone()
 
@@ -48,7 +48,7 @@ async def get_product(id: int,
         "details": None}
 
 
-@router.get("/seller/{id}", response_model=List[ProductGet])
+@router.get("/seller/{id}", response_model=ProductGet)
 async def get_products_by_seller_id(
         id: int,
         limit: int,
@@ -66,7 +66,15 @@ async def get_products_by_seller_id(
             "status": "error",
             "data": None,
             "details": "offset must be greater then 0"})
-    query = select(product).where(product.c.seller_id ==
+
+    query = select(Product).where(Product.seller_id ==
                                   id).limit(limit).offset(offset)
+
     result = await session.execute(query)
-    return result.all()
+    result: List = [x[0].serialize for x in result.all()]
+
+    return {
+        "status": "succes",
+        "data": result,
+        "details": None
+    }
