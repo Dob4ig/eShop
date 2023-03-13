@@ -2,6 +2,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from auth.models import User
+from auth.base_config import fastapi_users
 from product.schemas import ProductAdd
 from product.models import Product
 from database import get_async_session
@@ -12,8 +14,18 @@ router = APIRouter()
 
 @router.post("/add")
 async def add_product(new_product: ProductAdd,
-                      session: AsyncSession = Depends(get_async_session)):
-    stmt = insert(Product).values(**new_product.dict())
+                      session: AsyncSession = Depends(get_async_session),
+                      user: User = Depends(fastapi_users.current_user())):
+    if not user.is_seller:
+        raise HTTPException(401, detail=getResponse(
+            Status.ERROR,
+            None,
+            "You are not a seller"
+        ))
+    new_product: dict = new_product.dict()
+    new_product["seller_id"] = user.id
+
+    stmt = insert(Product).values(**new_product)
     await session.execute(stmt)
     await session.commit()
     return getResponse(
