@@ -51,8 +51,22 @@ async def get_product(id: int,
 @router.get("/seller/{id}", response_model=List[ProductGet])
 async def get_products_by_seller_id(
         id: int,
+        limit: int,
+        offset: int,
         session: AsyncSession = Depends(get_async_session)):
 
-    query = select(product).where(product.c.seller_id == id)
+    if limit < 0 or limit > 100:
+        raise HTTPException(400, detail={
+            "status": "error",
+            "data": None,
+            "details": "Limit must be >0 and < 100"
+        })
+    if offset < 0:
+        raise HTTPException(400, detail={
+            "status": "error",
+            "data": None,
+            "details": "offset must be greater then 0"})
+    query = select(product).where(product.c.seller_id ==
+                                  id).limit(limit).offset(offset)
     result = await session.execute(query)
     return result.all()
