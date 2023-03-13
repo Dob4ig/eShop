@@ -1,4 +1,6 @@
 from enum import Enum
+from pydantic import BaseModel
+from typing import Optional
 
 
 class Status(Enum):
@@ -15,3 +17,9 @@ async def getResponse(status: Status,
         "data": data,
         "details": details
     }
+
+
+class ResponseBaseSchema(BaseModel):
+    status: Status
+    # Extend this class and add data field
+    details: Optional[str]
