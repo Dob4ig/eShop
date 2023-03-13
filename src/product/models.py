@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, Text,\
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Text,\
     FLOAT, ForeignKey
 from datetime import datetime
 from sqlalchemy import MetaData

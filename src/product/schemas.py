@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from response import ResponseBaseSchema
 
 
 class ProductAdd(BaseModel):
@@ -17,7 +18,5 @@ class Product(BaseModel):
     seller_id: int = Field(ge=0)
 
 
-class ProductGet(BaseModel):
-    status: str
+class ProductGet(ResponseBaseSchema):
     data: Optional[List[Product]]
-    details: Optional[str]
