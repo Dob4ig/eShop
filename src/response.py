@@ -8,9 +8,9 @@ class Status(Enum):
     ERROR = "error"
 
 
-async def getResponse(status: Status,
-                      data: any = None,
-                      details: any = None) -> dict:
+async def get_response(status: Status,
+                       data: any = None,
+                       details: any = None) -> dict:
 
     return {
         "status": status,

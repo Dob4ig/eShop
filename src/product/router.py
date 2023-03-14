@@ -8,7 +8,7 @@ from product.schemas import ProductAdd
 from product.models import Product
 from database import get_async_session
 from product.schemas import ProductGet
-from response import getResponse, Status
+from response import get_response, Status
 router = APIRouter()
 
 
@@ -17,7 +17,7 @@ async def add_product(new_product: ProductAdd,
                       session: AsyncSession = Depends(get_async_session),
                       user: User = Depends(fastapi_users.current_user())):
     if not user.is_seller:
-        raise HTTPException(401, detail=getResponse(
+        raise HTTPException(401, detail=get_response(
             Status.ERROR,
             None,
             "You are not a seller"
@@ -28,7 +28,7 @@ async def add_product(new_product: ProductAdd,
     stmt = insert(Product).values(**new_product)
     await session.execute(stmt)
     await session.commit()
-    return getResponse(
+    return get_response(
         Status.SUCCESS,
         new_product.dict(),
         "New product added"
@@ -39,7 +39,7 @@ async def add_product(new_product: ProductAdd,
 async def get_product(id: int,
                       session: AsyncSession = Depends(get_async_session)):
     if id < 0:
-        raise HTTPException(400, detail=getResponse(
+        raise HTTPException(400, detail=get_response(
             Status.ERROR,
             None,
             "Product id cannot be negative number"
@@ -50,13 +50,13 @@ async def get_product(id: int,
     result = result.fetchone()
 
     if result is None:
-        raise HTTPException(404, detail=getResponse(
+        raise HTTPException(404, detail=get_response(
             Status.ERROR,
             None,
             f"Post with id={id} not found"
         ))
 
-    return getResponse(Status.SUCCESS, tuple(result), None)
+    return get_response(Status.SUCCESS, tuple(result), None)
 
 
 @router.get("/seller/{id}", response_model=ProductGet)
@@ -67,7 +67,7 @@ async def get_products_by_seller_id(
         session: AsyncSession = Depends(get_async_session)):
 
     if limit < 0 or limit > 100:
-        raise HTTPException(400, detail=getResponse(
+        raise HTTPException(400, detail=get_response(
             Status.ERROR,
             None,
             "Limit must be >0 and < 100"
@@ -75,10 +75,10 @@ async def get_products_by_seller_id(
     if offset < 0:
         raise HTTPException(
             400,
-            detail=getResponse(Status.ERROR,
-                               None,
-                               "offset must be greater then 0"
-                               ))
+            detail=get_response(Status.ERROR,
+                                None,
+                                "offset must be greater then 0"
+                                ))
 
     query = select(Product).where(Product.seller_id ==
                                   id).limit(limit).offset(offset)
@@ -86,4 +86,4 @@ async def get_products_by_seller_id(
     result = await session.execute(query)
     result: List = [x[0].serialize for x in result.all()]
 
-    return await getResponse(Status.SUCCESS, result)
+    return await get_response(Status.SUCCESS, result)
