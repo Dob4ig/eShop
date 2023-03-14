@@ -2,10 +2,8 @@ from database import Base
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Text,\
     FLOAT, ForeignKey
 from datetime import datetime
-from sqlalchemy import MetaData
-from auth.models import user as user_model
 
-metadata = MetaData()
+from auth.models import user as user_model
 
 
 class Product(Base):
